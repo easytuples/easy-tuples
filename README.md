@@ -1,37 +1,119 @@
-## Welcome to GitHub Pages
+#  Easy Tuples for Java
 
-You can use the [editor on GitHub](https://github.com/easy-tuples/easy-tuples/edit/main/README.md) to maintain and preview the content for your website in Markdown files.
+---
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Overview
 
-### Markdown
+With Java 16 providing us with [records](https://openjdk.java.net/jeps/395) as a standard feature we now have a way
+of creating tuples in Java. However, these are 'nominal' tuples - in other words the tuples need to be named.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+In some situations (where the scope of the tuple will only exist within a single method
+body, for example) it is just more convenient to not bother naming the tuple and view it
+instead structurally - for example as a pair (2-tuple) or triplet (3-tuple) or otherwise.
 
-```markdown
-Syntax highlighted code block
+Enter the easy-tuples library...
 
-# Header 1
-## Header 2
-### Header 3
+easy-tuples provides easy and convenient generic records representing tuples with one to ten fields and with a
+consistent naming. You can use easy-tuples in the situation where it makes code more readable to remove the
+'nominal' and think 'structural'.
 
-- Bulleted
-- List
+```java
+// Create a pair and a triplet...       // toString():
+var d1 = _2.of(25, "December");         // _2[_1=25, _2=December]
+var d2 = _3.of(12, "January", 2021);    // _3[_1=12, _2=January, _3=2021]
 
-1. Numbered
-2. List
+// Append the missing year on d1.
+var d1Updated = d1.append(2021);        // _3[_1=25, _2=December, _3=2021]
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+// Get the month of d1 and use a setter
+// of d2 to make them equal. 
+var d1Month = d1._2();  // Use the getter for the field 
+var d2Updated = d2.set2(d1Month);       // _3[_1=12, _2=December, _3=2021]
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+## Usage
 
-### Jekyll Themes
+### Dependency Coordinates
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/easy-tuples/easy-tuples/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+easy-tuples is available on maven-central:
+TODO
 
-### Support or Contact
+### API
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+Each tuple exposes an intuitive, uniform API:
+- Name
+    - Tuples are named with an underscore followed by the size of the record e.g. `_1`, `_2`, etc.
+    - Similarly, fields within the tuple are named with an underscore followed by their positional index.
+        - Tuples are 1-indexed (not 0-indexed), so the names of their fields are `_1`, `_2`, etc.
+    ```java
+    // Declarations illustrating the intuitive naming convention of each generic tuple record and its fields:
+    // ... 
+    public record _2<A, B>(A _1, B _2) { /* ... */ }
+    public record _3<A, B, C>(A _1, B _2, C _3) { /* ... */ }
+    // ...
+    ```
+- Creation/Factory Method
+    - You can use the canonical constructor to create an instance of each tuple:
+  ```java
+  // Creating a 2-tuple of a String and Int using the constructor:
+  _2<String, Integer> a = new _2<>("hello", 4);
+  // If you use type inference (var) and the diamond operator, <>, you don't have to specify any types:
+  var b = new _2<>("hello", 4); // Type of _2<String, Integer>
+  ```   
+    - Alternatively you can use the factory method, `of(..)` which is defined for each tuple, along
+      with `var` and also avoid having to declare any types.
+  ```java
+  var c = _2.of("what's", "up?");            // Type of _2<String, String>
+  var d = _3.of(1, 'c', "what's up doc?");   // Type of _3<Integer, Character, String> 
+  ```
+- Getters
+    - Fields of the tuple are retrievable with public getter methods named after the fields themselves e.g.  `_1()`, `_2
+      ()`, etc.
+  ```java
+  var d = _3.of(1, 'c', "what's up doc?");
+  Integer fst = d._1();  // Integer: 1
+  Character snd = d._2();  // Char: 'c'
+  String thd = d._3();  // String: "what's up doc?"
+  ```
+- Setters
+    - Setters allow you to generate a new tuple with the element at the given index in the tuple replaced with your
+      object.
+    - Setters are named `setN` with `N` replaced with the index in the tuple we want to replace (remember tuples are
+      1-indexed not 0-indexed).
+    - Tuples are immutable so setters always return a new object.
+  ```java
+  // 3-tuple will come with three setters, named set1(..), set2(..), set3(..)
+  var harry = _3.of("Harry", "Potter", "4 Privet Drive"); // _3[_1=Harry, _2=Potter, _3=4 Privet Drive]
+
+  // We want to set field at the third index to a new value.
+  var harryUpdated = harry.set3("Hogwarts School");       // _3[_1=Harry, _2=Potter, _3=Hogwarts School]
+  
+  // harry remains unchanged since tuples are immutable....   
+  ```  
+- Appender
+    - Tuples come with a method `append(T arg)` which takes a single argument and returns a new tuple one size
+      larger that has the `T arg` object appended on at the last index.
+    - All tuples have this method except the 10-tuple which, being the largest size tuple available, cannot append
+      anymore objects to it.
+  ```java
+  // We want to append to an existing tuple
+  var harry = _3.of("Harry", "Potter", "4 Privet Drive"); // _3[_1=Harry, _2=Potter, _3=4 Privet Drive]
+  var harryUpdated = harry.append("Student"); 
+  ```
+
+## Suggested Use
+
+- As intermediate, temporary objects within a stream.
+- Within non-public method bodies and (rarely) as non-public method return types.
+
+
+## Non suggested use
+
+It is probably best to avoid using these tuples:
+- across code boundaries in public APIs (in that case a properly named tuple would be better).
+
+
+## FAQs
+
+- Q: I want more than a 10-tuple.
+- A: Check out the code generator sub-project in this repo and use it to generate your own records up to 26 in size.
