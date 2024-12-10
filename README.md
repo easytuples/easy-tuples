@@ -1,4 +1,4 @@
-#  Easy Tuples for Java
+#  [Easy Tuples for Java](https://easytuples.github.io/easy-tuples/)
 
 ---
 
@@ -27,7 +27,7 @@ var d1Updated = d1.append(2021);        // _3[_1=25, _2=December, _3=2021]
 
 // Get the month of d1 and use a setter
 // of d2 to make them equal. 
-var d1Month = d1._2();  // Use the getter for the field 
+var d1Month = d1._2();                  // Use the getter for the field 
 var d2Updated = d2.set2(d1Month);       // _3[_1=12, _2=December, _3=2021]
 ```
 
@@ -35,8 +35,24 @@ var d2Updated = d2.set2(d1Month);       // _3[_1=12, _2=December, _3=2021]
 
 ### Dependency Coordinates
 
-easy-tuples is available on maven-central:
-TODO
+easy-tuples [is available at Maven Central](https://central.sonatype.com/artifact/io.github.easytuples/easy-tuples)
+
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.easytuples/easy-tuples)
+
+Maven style coordinates:
+```xml
+<dependency>
+    <groupId>io.github.easytuples</groupId>
+    <artifactId>easy-tuples</artifactId>
+    <version>$LATEST_VERSION<!-- see above badge --></version>
+</dependency>
+```
+
+And Gradle:
+
+```groovy
+implementation 'io.github.easytuples:easy-tuples:$LATEST_VERSION' // See maven central badge above for latest version
+```
 
 ### API
 
@@ -71,9 +87,9 @@ Each tuple exposes an intuitive, uniform API:
       ()`, etc.
   ```java
   var d = _3.of(1, 'c', "what's up doc?");
-  Integer fst = d._1();  // Integer: 1
+  Integer fst = d._1();    // Integer: 1
   Character snd = d._2();  // Char: 'c'
-  String thd = d._3();  // String: "what's up doc?"
+  String thd = d._3();     // String: "what's up doc?"
   ```
 - Setters
     - Setters allow you to generate a new tuple with the element at the given index in the tuple replaced with your
@@ -84,12 +100,10 @@ Each tuple exposes an intuitive, uniform API:
   ```java
   // 3-tuple will come with three setters, named set1(..), set2(..), set3(..)
   var harry = _3.of("Harry", "Potter", "4 Privet Drive"); // _3[_1=Harry, _2=Potter, _3=4 Privet Drive]
-
   // We want to set field at the third index to a new value.
   var harryUpdated = harry.set3("Hogwarts School");       // _3[_1=Harry, _2=Potter, _3=Hogwarts School]
-  
   // harry remains unchanged since tuples are immutable....   
-  ```  
+  ```
 - Appender
     - Tuples come with a method `append(T arg)` which takes a single argument and returns a new tuple one size
       larger that has the `T arg` object appended on at the last index.
@@ -98,8 +112,10 @@ Each tuple exposes an intuitive, uniform API:
   ```java
   // We want to append to an existing tuple
   var harry = _3.of("Harry", "Potter", "4 Privet Drive"); // _3[_1=Harry, _2=Potter, _3=4 Privet Drive]
-  var harryUpdated = harry.append("Student"); 
+  var harryUpdated = harry.append("Student");             // _4[_1=Harry, _2=Potter, _3=4 Privet Drive, _4=Student]
   ```
+    - Appending is particularly useful in streams when you need to perform a `map` on an object in the tuple but
+      don't want to lose the object itself in the next operation in the stream. 
 
 ## Suggested Use
 
